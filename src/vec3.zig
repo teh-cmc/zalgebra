@@ -237,6 +237,23 @@ pub fn Vector3(comptime T: type) type {
                 @maximum(lhs.z, rhs.z),
             );
         }
+
+        /// Construct a new vector from absolute components.
+        pub fn abs(self: Self) Self {
+            return switch (@typeInfo(T)) {
+                .Float => Self.new(
+                    math.absFloat(self.x),
+                    math.absFloat(self.y),
+                    math.absFloat(self.z),
+                ),
+                .Int => Self.new(
+                    math.absInt(self.x),
+                    math.absInt(self.y),
+                    math.absInt(self.z),
+                ),
+                else => unreachable,
+            };
+        }
     };
 }
 
@@ -372,6 +389,19 @@ test "zalgebra.Vec3.max" {
     var b = Vec3.new(-10.0, 5.0, 0.0);
 
     try expectEqual(Vec3.eql(Vec3.max(a, b), Vec3.new(10.0, 5.0, 0.0)), true);
+}
+
+test "zalgebra.Vec4.abs" {
+    {
+        const vec = Vec3.new(-42, -43, -44);
+        const expected = Vec3.new(42, 43, 44);
+        try expectEqual(expected, vec.abs());
+    }
+    {
+        const vec = Vec3.new(42, 43, 44);
+        const expected = Vec3.new(42, 43, 44);
+        try expectEqual(expected, vec.abs());
+    }
 }
 
 test "zalgebra.Vec3.at" {

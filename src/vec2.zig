@@ -177,6 +177,21 @@ pub fn Vector2(comptime T: type) type {
                 @maximum(left.y, right.y),
             );
         }
+
+        /// Construct a new vector from absolute components.
+        pub fn abs(self: Self) Self {
+            return switch (@typeInfo(T)) {
+                .Float => Self.new(
+                    math.absFloat(self.x),
+                    math.absFloat(self.y),
+                ),
+                .Int => Self.new(
+                    math.absInt(self.x),
+                    math.absInt(self.y),
+                ),
+                else => unreachable,
+            };
+        }
     };
 }
 
@@ -287,6 +302,19 @@ test "zalgebra.Vec2.max" {
     var b = Vec2.new(-10.0, 5.0);
 
     try expectEqual(Vec2.eql(Vec2.max(a, b), Vec2.new(10.0, 5.0)), true);
+}
+
+test "zalgebra.Vec2.abs" {
+    {
+        const vec = Vec2.new(-42, -43);
+        const expected = Vec2.new(42, 43);
+        try expectEqual(expected, vec.abs());
+    }
+    {
+        const vec = Vec2.new(42, 43);
+        const expected = Vec2.new(42, 43);
+        try expectEqual(expected, vec.abs());
+    }
 }
 
 test "zalgebra.Vec2.fromSlice" {
